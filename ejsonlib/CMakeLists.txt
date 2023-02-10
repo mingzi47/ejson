@@ -1,1 +1,1 @@
-add_library(jsonlib STATIC json.cc parser.cc)
+add_library(ejson STATIC json.cc parser.cc)

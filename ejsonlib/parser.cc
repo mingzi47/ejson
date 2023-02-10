@@ -1,4 +1,3 @@
-#pragma once
 #include "parser.hh"
 #include <stdexcept>
 #include <optional>

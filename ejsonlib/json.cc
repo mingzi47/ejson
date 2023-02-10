@@ -1,21 +1,14 @@
-#pragma once
 #include <cstdint>
+#include <iostream>
 #include <memory>
 #include <optional>
 #include <ostream>
 #include <stdexcept>
 #include <string>
 #include <variant>
-#include <iostream>
 
 #include "json.hh"
 using namespace eee;
-
-#define PRINT_ERROR(error)                                                     \
-    {                                                                          \
-        std::cerr << "\n ! ERROR : " << __FILE__ << ":" << __LINE__ << " : \n" \
-                  << "   " << error << "\n";                                   \
-    }
 
 using std::string;
 using array = std::vector<Json>;
@@ -113,16 +106,13 @@ void Json::copy(const Json &other) {
     clear();
     switch (other._type) {
         case Type::JSON_STRING:
-            _value = std::make_unique<string>(
-                *std::get<str_ptr>(other._value).get());
+            _value = std::make_unique<string>(*std::get<str_ptr>(other._value));
             break;
         case Type::JSON_ARRAY:
-            _value =
-                std::make_unique<array>(*std::get<arr_ptr>(other._value).get());
+            _value = std::make_unique<array>(*std::get<arr_ptr>(other._value));
             break;
         case Type::JSON_OBJECT:
-            _value = std::make_unique<object>(
-                *std::get<obj_ptr>(other._value).get());
+            _value = std::make_unique<object>(*std::get<obj_ptr>(other._value));
             break;
         default:
             break;
@@ -182,7 +172,7 @@ void Json::operator=(const object &value) {
 }
 
 bool Json::equal(const Json &other) const {
-    if (_type != other._type) return false;
+    if (_type != other._type) { return false; }
     switch (_type) {
         case Type::JSON_STRING:
             return *(std::get<str_ptr>(_value))
@@ -273,7 +263,6 @@ std::optional<std::size_t> Json::length() const {
     if (_type == Type::JSON_STRING) {
         return std::get<str_ptr>(_value)->length();
     }
-    PRINT_ERROR("length() => type error");
     return std::nullopt;
 }
 
@@ -351,7 +340,6 @@ void Json::erase(const std::string &key) {
         throw std::logic_error("erase(const std::string key) => type error");
     }
     std::get<obj_ptr>(_value)->erase(key);
-    // it->erase(key);
 }
 
 bool Json::empty() const {
@@ -385,7 +373,7 @@ std::string Json::fmtStringify() const {
 }
 
 std::string Json::pstringify(std::size_t spaceNum, bool isFmt) const {
-    string ret;
+    string ret{};
     switch (_type) {
         case Type::JSON_NULL:
             ret += "null";
@@ -400,45 +388,45 @@ std::string Json::pstringify(std::size_t spaceNum, bool isFmt) const {
             ret += std::to_string(std::get<double>(_value));
             break;
         case Type::JSON_STRING:
-            if (isFmt) ret += "\"";
+            if (isFmt) { ret += "\""; }
             ret += std::string_view{*std::get<str_ptr>(_value)};
-            if (isFmt) ret += "\"";
+            if (isFmt) { ret += "\""; }
             break;
         case Type::JSON_ARRAY: {
             ret += "[";
-            if (isFmt) ret += "\n";
+            if (isFmt) { ret += "\n"; }
             size_t i = 0;
-            for (auto value : *std::get<arr_ptr>(_value)) {
+            for (const auto &value : *std::get<arr_ptr>(_value)) {
                 if (i != 0) {
                     ret += ',';
-                    if (isFmt) ret += '\n';
+                    if (isFmt) { ret += '\n'; }
                 }
                 i++;
-                if (isFmt) ret += std::string(spaceNum + 2, ' ');
+                if (isFmt) { ret += std::string(spaceNum + 2, ' '); }
                 ret += value.pstringify(spaceNum + 2, isFmt);
             }
-            if (isFmt) ret += "\n";
-            if (isFmt) ret += std::string(spaceNum, ' ');
+            if (isFmt) { ret += "\n"; }
+            if (isFmt) { ret += std::string(spaceNum, ' '); }
             ret += "]";
             break;
         }
         case Type::JSON_OBJECT: {
-            if (isFmt) ret += "{\n";
+            if (isFmt) { ret += "{\n"; }
             size_t i = 0;
-            for (auto [k, v] : *std::get<obj_ptr>(_value)) {
+            for (const auto [k, v] : *std::get<obj_ptr>(_value)) {
                 if (i != 0) {
                     ret += ',';
-                    if (isFmt) ret += '\n';
+                    if (isFmt) { ret += '\n'; }
                 }
-                if (isFmt) ret += std::string(spaceNum + 2, ' ');
+                if (isFmt) { ret += std::string(spaceNum + 2, ' '); }
                 ret += "\"";
                 ret += k;
                 ret += "\" : ";
                 ret += v.pstringify(spaceNum + 7 + k.size(), isFmt);
                 i++;
             }
-            if (isFmt) ret += '\n';
-            if (isFmt) ret += std::string(spaceNum, ' ');
+            if (isFmt) { ret += '\n'; }
+            if (isFmt) { ret += std::string(spaceNum, ' '); }
             ret += "}";
             break;
         }
