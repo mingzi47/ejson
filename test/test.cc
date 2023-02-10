@@ -14,25 +14,22 @@ using object = std::map<std::string, Json>;
 static int tot_test = 0;
 static int acc_test = 0;
 
-#define EQUAL(expectly, actualy)\
-{\
-    tot_test++;\
-    if (expectly == actualy)\
-    {\
-        acc_test++;\
-    }\
-    else\
-    {\
-        std::fprintf(stderr,"%s:%d\n",__FILE__, __LINE__);\
-    }\
-}
+#define EQUAL(expectly, actualy)                                 \
+    {                                                            \
+        tot_test++;                                              \
+        if (expectly == actualy) {                               \
+            acc_test++;                                          \
+        } else {                                                 \
+            std::fprintf(stderr, "%s:%d\n", __FILE__, __LINE__); \
+        }                                                        \
+    }
 
-#define TEST_TYPE(expectly, value)\
-{\
-    Json j(value);\
-    auto ac = j.type();\
-    EQUAL(expectly, ac);\
-}
+#define TEST_TYPE(expectly, value) \
+    {                              \
+        Json j(value);             \
+        auto ac = j.type();        \
+        EQUAL(expectly, ac);       \
+    }
 
 void test_c() {
     Json j0{};
@@ -47,7 +44,7 @@ void test_c() {
         // std::cout << std::get<double>(j7.value) << "\n";
     }
     // std::cout << (j0.type == Type::JSON_DOUBLE) << "\n";
-    Json j4((char*)"123455");
+    Json j4((char *)"123455");
     Json j5(std::string("123455"));
     EQUAL(6, j4.size());
     EQUAL(6, j5.size());
@@ -60,25 +57,27 @@ void test_c() {
     {
         Json cj1("11111111111111111111111111111111111111111111111111");
         cj2 = cj1;
-        // std::cout << " { cj1 = " << *std::get<std::string*>(cj1.value) << "\n";
-        // std::cout << " { cj2 = " <<  *std::get<std::string*>(cj2.value) << "\n";
+        // std::cout << " { cj1 = " << *std::get<std::string*>(cj1.value) <<
+        // "\n"; std::cout << " { cj2 = " <<  *std::get<std::string*>(cj2.value)
+        // << "\n";
     }
     // std::cout << " } cj2 = " <<  *std::get<std::string*>(cj2.value) << "\n";
 
-    Json a1; 
+    Json a1;
     {
         array v = {j1, j2, j4, j5};
         // std::cout << " { v = " << v.size() << "\n";
         Json a2(v);
-        EQUAL(true,a2.size().has_value());
+        EQUAL(true, a2.size().has_value());
         EQUAL(4, a2.size());
         EQUAL(true, a2.isArray());
         TEST_TYPE(Type::JSON_ARRAY, v);
         a2 = 1;
         TEST_TYPE(Type::JSON_INT, a2.type());
         a1 = a2;
-        // std::cout << " { a1 = " <<  (*std::get<array*>(a1.value)).size()<< "\n";
-        // std::cout << " { a2 = " <<  (*std::get<array*>(a2.value)).size()<< "\n";
+        // std::cout << " { a1 = " <<  (*std::get<array*>(a1.value)).size()<<
+        // "\n"; std::cout << " { a2 = " <<
+        // (*std::get<array*>(a2.value)).size()<< "\n";
     }
 
     // std::cout << " } a1 = " <<  (*std::get<array*>(a1.value)).size()<< "\n";
@@ -97,29 +96,31 @@ void test_c() {
         m1 = m2;
         m2 = nullptr;
         TEST_TYPE(Type::JSON_NULL, m2.type());
-        // std::cout << " { m1 = " <<  (*std::get<object*>(m1.value)).size()<< "\n";
-        // std::cout << " { m2 = " <<  (*std::get<object*>(m2.value)).size()<< "\n";
+        // std::cout << " { m1 = " <<  (*std::get<object*>(m1.value)).size()<<
+        // "\n"; std::cout << " { m2 = " <<
+        // (*std::get<object*>(m2.value)).size()<< "\n";
     }
     // std::cout << " } m1 = " <<  (*std::get<object*>(m1.value)).size()<< "\n";
 
     // test std::move
     Json mv1 = m1;
     {
-        // std::cout << " { mv1 = " <<  (*std::get<object*>(mv1.value)).size()<< "\n";
+        // std::cout << " { mv1 = " <<  (*std::get<object*>(mv1.value)).size()<<
+        // "\n";
         EQUAL(Type::JSON_OBJECT, mv1.type());
         Json mv2 = std::move(mv1);
         EQUAL(Type::JSON_OBJECT, mv2.type());
         EQUAL(Type::JSON_NULL, mv1.type());
         mv2 = "1222222222222222";
         TEST_TYPE(Type::JSON_STRING, mv2.type());
-        // std::cout << " { mv2 = " <<  (*std::get<object*>(mv2.value)).size()<< "\n";
+        // std::cout << " { mv2 = " <<  (*std::get<object*>(mv2.value)).size()<<
+        // "\n";
     }
-        // std::cout << " } mv1 = " <<  (std::get<std::nullptr_t>(mv1.value) == nullptr)<< "\n";
-    std::vector<Json> v111 = {1, 2, 3, 4 ,5};
+    // std::cout << " } mv1 = " <<  (std::get<std::nullptr_t>(mv1.value) ==
+    // nullptr)<< "\n";
+    std::vector<Json> v111 = {1, 2, 3, 4, 5};
     Json v222(v111);
-    for (std::size_t i = 0; i < v111.size(); i++) {
-        EQUAL(v111[i], v222[i]);
-    }
+    for (std::size_t i = 0; i < v111.size(); i++) { EQUAL(v111[i], v222[i]); }
     std::vector<Json> v333 = {1, "2", 3, 4, 5};
     Json v444(v333);
     EQUAL(false, (v222 == v444))
@@ -154,7 +155,7 @@ void test_c() {
     EQUAL(v333, v444.valueArray());
     EQUAL(m111, m222.valueObject());
     EQUAL(false, m222.valueBool().has_value());
-    std::vector<Json> v555 = {1, 2, 3, 4 ,5};
+    std::vector<Json> v555 = {1, 2, 3, 4, 5};
     Json v666(v555);
     v666.push_back(t111);
     // std::cout << v666.stringify() << "\n";
@@ -178,17 +179,15 @@ void test_c() {
     m222["4"] = v555;
     mee1.insert(std::pair<std::string, Json>(std::string("x"), m222));
     // std::cout << mee1.stringify() << "\n";
-
 }
-
 
 void test_type() {
     TEST_TYPE(Type::JSON_NULL, Type::JSON_NULL);
     TEST_TYPE(Type::JSON_BOOL, true);
     TEST_TYPE(Type::JSON_INT, 100);
-    TEST_TYPE(Type::JSON_STRING, (char*)"1234556");
+    TEST_TYPE(Type::JSON_STRING, (char *)"1234556");
     TEST_TYPE(Type::JSON_STRING, std::string("123456"));
-    array v = {1, 2 ,3 ,4 ,5};
+    array v = {1, 2, 3, 4, 5};
     TEST_TYPE(Type::JSON_ARRAY, v);
     TEST_TYPE(Type::JSON_NULL, nullptr);
     EQUAL(true, Json(1).isInt());
@@ -200,10 +199,10 @@ void test_type() {
     EQUAL(true, Json().isNull());
 }
 
-void test_parser()
-{   
+void test_parser() {
     tot_test++;
-    std::string a = "[{\"111\" : \"111\", \"222\" : null, \"333\" : [false, true], \"444\" : 1e-5}, false, [true, false]]";
+    std::string a =
+        "[{\"111\" : \"111\", \"222\" : null, \"333\" : [false, true], \"444\" : 1e-5}, false, [true, false]]";
     // std::cout << "parser a" << "\n";
     Parser pr(a);
     // std::cout << "parser b" << "\n";
@@ -214,13 +213,10 @@ void test_parser()
     x.insert({"444", 1e-5});
     Json b = std::vector<Json>{x, false, std::vector<Json>{true, false}};
 
-    if (pr.getValue() == b)
-    {
+    if (pr.getValue() == b) {
         acc_test++;
-        // std::cout << "Yes\n";    
-    }
-    else
-    {
+        // std::cout << "Yes\n";
+    } else {
         // std::cout << "No\n";
     }
 
@@ -236,9 +232,8 @@ void test() {
 int main() {
     test();
 
-    printf("\n test result = %0.2f%% pass(%d/%d)\n", 
-    (acc_test * 1.0) / tot_test * 100.0,
-    acc_test, 
-    tot_test);
+    printf(
+        "\n test result = %0.2f%% pass(%d/%d)\n",
+        (acc_test * 1.0) / tot_test * 100.0, acc_test, tot_test);
     return 0;
 }
