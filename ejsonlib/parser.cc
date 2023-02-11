@@ -8,102 +8,102 @@
 
 using namespace eee;
 
-Parser::Parser() : tokens(nullptr), json_data(), pos(0) {
+Parser::Parser() : _tokens(nullptr), _data(), _pos(0) {
 }
 
-Parser::Parser(std::string data) : tokens(data), json_data(), pos(0) {
+Parser::Parser(const std::string &data) : _tokens(data), _data(), _pos(0) {
     Parser::parse();
 }
 
 Json Parser::getValue() {
-    return json_data;
+    return _data;
 }
 
 void Parser::clear() {
-    pos = 0;
-    json_data = nullptr;
+    _pos = 0;
+    _data = nullptr;
 }
 
 void Parser::parse_whitespace() {
-    while ((pos < tokens.size())
-           && (tokens[pos] == '\t' || tokens[pos] == '\n' || tokens[pos] == '\r'
-               || tokens[pos] == ' ')) {
-        this->pos++;
+    while ((_pos < _tokens.size())
+           && (_tokens[_pos] == '\t' || _tokens[_pos] == '\n' || _tokens[_pos] == '\r'
+               || _tokens[_pos] == ' ')) {
+        this->_pos++;
     }
 }
 
 Json Parser::parse_null() {
-    if (tokens.find("null", pos) != pos) {
+    if (_tokens.find("null", _pos) != _pos) {
         throw std::logic_error("value is not NULL ! ");
     }
-    pos += 4;
+    _pos += 4;
     return Json();
 }
 
 Json Parser::parse_bool(bool flag) {
     if (flag) {
-        if (tokens.find("true", pos) != pos) {
+        if (_tokens.find("true", _pos) != _pos) {
             throw std::logic_error("value is not TRUE ! ");
         }
-        pos += 4;
+        _pos += 4;
         return Json(true);
     }
-    if (tokens.find("false", pos) != pos) {
+    if (_tokens.find("false", _pos) != _pos) {
         throw std::logic_error("value is not FALSE ! ");
     }
-    pos += 5;
+    _pos += 5;
     return Json(false);
 }
 
 Json Parser::parse_number() {
-    int tmp = pos, m = tokens.size();
+    int tmp = _pos, m = _tokens.size();
     bool flag = false;
-    if (tokens[tmp] == '-') tmp++;
-    if (tokens[tmp] == '0') tmp++;
+    if (_tokens[tmp] == '-') tmp++;
+    if (_tokens[tmp] == '0') tmp++;
     else {
-        if (tokens[tmp] < '0' || tokens[tmp] > '9')
+        if (_tokens[tmp] < '0' || _tokens[tmp] > '9')
             throw std::logic_error("value is not number !");
-        for (; tmp < m && (tokens[tmp] >= '0' && tokens[tmp] <= '9'); tmp++)
+        for (; tmp < m && (_tokens[tmp] >= '0' && _tokens[tmp] <= '9'); tmp++)
             ;
     }
-    if (tokens[tmp] == '.') {
+    if (_tokens[tmp] == '.') {
         tmp++;
-        if (tokens[tmp] < '0' || tokens[tmp] > '9')
+        if (_tokens[tmp] < '0' || _tokens[tmp] > '9')
             throw std::logic_error("value is not number !");
         flag = true;
-        for (; tmp < m && (tokens[tmp] >= '0' && tokens[tmp] <= '9'); tmp++)
+        for (; tmp < m && (_tokens[tmp] >= '0' && _tokens[tmp] <= '9'); tmp++)
             ;
     }
-    if (tokens[tmp] == 'e' || tokens[tmp] == 'E') {
+    if (_tokens[tmp] == 'e' || _tokens[tmp] == 'E') {
         tmp++;
-        if (tokens[tmp] == '+' || tokens[tmp] == '-') tmp++;
-        if (tokens[tmp] < '0' || tokens[tmp] > '9')
+        if (_tokens[tmp] == '+' || _tokens[tmp] == '-') tmp++;
+        if (_tokens[tmp] < '0' || _tokens[tmp] > '9')
             throw std::logic_error("value is not number !");
         flag = true;
-        for (; tmp < m && (tokens[tmp] >= '0' && tokens[tmp] <= '9'); tmp++)
+        for (; tmp < m && (_tokens[tmp] >= '0' && _tokens[tmp] <= '9'); tmp++)
             ;
     }
     errno = 0;
-    double data = std::strtod(tokens.c_str() + pos, nullptr);
+    double data = std::strtod(_tokens.c_str() + _pos, nullptr);
     if (errno == ERANGE && (data == HUGE_VAL || data == -HUGE_VAL))
         throw std::logic_error("value is not number !");
-    pos = tmp;
+    _pos = tmp;
     if (flag) return Json(data);
     return Json((int)data);
 }
 
 Json Parser::parse_string() {
     std::string data;
-    pos++;
-    size_t m = tokens.size();
-    for (; pos < m; pos++) {
-        switch (tokens[pos]) {
+    _pos++;
+    size_t m = _tokens.size();
+    for (; _pos < m; _pos++) {
+        switch (_tokens[_pos]) {
             case '\\': {
-                if (pos + 1 < m) {
+                if (_pos + 1 < m) {
                     throw std::logic_error("String index failed !");
                 }
-                pos++;
-                switch (tokens[pos]) {
+                _pos++;
+                switch (_tokens[_pos]) {
                     case '\"':
                         data.push_back('\"');
                         break;
@@ -129,8 +129,8 @@ Json Parser::parse_string() {
                         data.push_back('\r');
                         break;
                     case 'u': {
-                        for (int i = 0; i < 4; i++, pos++)
-                            data.push_back(tokens[pos]);
+                        for (int i = 0; i < 4; i++, _pos++)
+                            data.push_back(_tokens[_pos]);
                         break;
                     }
                     default:
@@ -142,14 +142,14 @@ Json Parser::parse_string() {
                 throw std::logic_error(" string \\0 failed ! ");
             }
             case '\"': {
-                pos++;
+                _pos++;
                 return Json(data);
             }
             default: {
-                if ((unsigned char)tokens[pos] < 0x20) {
+                if ((unsigned char)_tokens[_pos] < 0x20) {
                     throw std::logic_error(" string failed ! ");
                 }
-                data.push_back(tokens[pos]);
+                data.push_back(_tokens[_pos]);
             }
         }
     }
@@ -158,20 +158,20 @@ Json Parser::parse_string() {
 
 Json Parser::parse_array() {
     std::vector<Json> data;
-    pos++;
-    size_t m = tokens.size();
-    for (; pos < m;) {
+    _pos++;
+    size_t m = _tokens.size();
+    for (; _pos < m;) {
         Parser::parse_whitespace();
 
         data.emplace_back(Parser::parse_value());
 
         Parser::parse_whitespace();
 
-        if (tokens[pos] == ']') {
-            pos++;
+        if (_tokens[_pos] == ']') {
+            _pos++;
             return Json(data);
-        } else if (tokens[pos] == ',') {
-            pos++;
+        } else if (_tokens[_pos] == ',') {
+            _pos++;
             continue;
         } else {
             break;
@@ -182,27 +182,27 @@ Json Parser::parse_array() {
 
 Json Parser::parse_object() {
     std::map<std::string, Json> data;
-    pos++;
-    size_t m = tokens.size();
-    for (; pos < m;) {
+    _pos++;
+    size_t m = _tokens.size();
+    for (; _pos < m;) {
         Parser::parse_whitespace();
-        if (tokens[pos] != '"') { std::logic_error("key failed !"); }
+        if (_tokens[_pos] != '"') { std::logic_error("key failed !"); }
         std::optional<std::string> tmp = Parser::parse_string().valueString();
         if (!tmp) { std::logic_error("key failed !"); }
         std::string key = tmp.value();
         Parser::parse_whitespace();
 
-        if (tokens[pos] != ':') { std::logic_error(": failed (object) !"); }
+        if (_tokens[_pos] != ':') { std::logic_error(": failed (object) !"); }
 
-        pos++;
+        _pos++;
         data[key] = Parser::parse_value();
         Parser::parse_whitespace();
 
-        if (tokens[pos] == '}') {
-            pos++;
+        if (_tokens[_pos] == '}') {
+            _pos++;
             return Json(data);
-        } else if (tokens[pos] == ',') {
-            pos++;
+        } else if (_tokens[_pos] == ',') {
+            _pos++;
             continue;
         } else {
             break;
@@ -213,7 +213,7 @@ Json Parser::parse_object() {
 
 Json Parser::parse_value() {
     Parser::parse_whitespace();
-    switch (tokens[pos]) {
+    switch (_tokens[_pos]) {
         case 'n':
             return parse_null();
         case 't':
@@ -235,13 +235,13 @@ Json Parser::parse_value() {
 Json Parser::parse() {
     Json data = Parser::parse_value();
     Parser::parse_whitespace();
-    if (tokens.size() > pos) { std::logic_error("parse is failed ! "); }
-    return json_data = std::move(data);
+    if (_tokens.size() > _pos) { std::logic_error("parse is failed ! "); }
+    return _data = std::move(data);
 }
 
-Json Parser::parse(std::string data) {
+Json Parser::parse(const std::string &data) {
     Parser::clear();
-    tokens = data;
-    pos = 0;
+    _tokens = data;
+    _pos = 0;
     return Parser::parse();
 }

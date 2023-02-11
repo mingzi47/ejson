@@ -16,4 +16,3 @@ add_subdirectory(./ejsonlib)
 
 add_subdirectory(./test)
 
-add_subdirectory(./example)

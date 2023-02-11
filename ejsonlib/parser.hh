@@ -6,19 +6,11 @@
 namespace eee {
 
 class Parser {
-  public:
-    Parser();
-    Parser(std::string data);
-    ~Parser() = default;
-
-    Json parse();
-    Json parse(std::string data);
-
-    Json getValue();
-
-    void clear();
-
   private:
+    std::string _tokens; 
+    Json _data;
+    std::size_t _pos;
+
     void parse_whitespace();
     Json parse_value();
     Json parse_null();
@@ -27,11 +19,17 @@ class Parser {
     Json parse_string();
     Json parse_array();
     Json parse_object();
+  public:
+    Parser();
+    Parser(const std::string &data);
+    ~Parser() = default;
 
-  private:
-    std::string tokens;
-    Json json_data;
-    std::size_t pos;
+    Json parse();
+    Json parse(const std::string &data);
+
+    Json getValue();
+
+    void clear();
 };
 
 } // namespace eee

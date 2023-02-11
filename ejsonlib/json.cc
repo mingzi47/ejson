@@ -5,6 +5,7 @@
 #include <ostream>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <variant>
 
 #include "json.hh"
@@ -68,11 +69,11 @@ Json::Json(const string &value)
 }
 
 Json::Json(const std::vector<Json> &value)
-    : _type{Type::JSON_ARRAY}, _value(std::make_unique<array>(value)) {
+    : _type{Type::JSON_ARRAY}, _value{std::make_unique<array>(value)} {
 }
 
 Json::Json(const std::map<std::string, Json> &value)
-    : _type(Type::JSON_OBJECT), _value(std::make_unique<object>(value)) {
+    : _type{Type::JSON_OBJECT}, _value{std::make_unique<object>(value)} {
 }
 
 Json::Json(const Json &value) {
@@ -83,6 +84,7 @@ Json::Json(Json &&other) noexcept {
     clear();
     other._value.swap(_value);
     _type = other._type;
+    other._type = Type::JSON_NULL;
 }
 
 Json::~Json() {
@@ -90,8 +92,8 @@ Json::~Json() {
     _type = Type::JSON_NULL;
 }
 
-Json &Json::operator=(Json const &other) {
-    this->copy(other);
+Json &Json::operator=(const Json &other) {
+    copy(other);
     return *this;
 }
 
@@ -99,6 +101,7 @@ Json &Json::operator=(Json &&other) noexcept {
     clear();
     other._value.swap(_value);
     _type = other._type;
+    other._type = Type::JSON_NULL;
     return *this;
 }
 
@@ -114,14 +117,22 @@ void Json::copy(const Json &other) {
         case Type::JSON_OBJECT:
             _value = std::make_unique<object>(*std::get<obj_ptr>(other._value));
             break;
-        default:
+        case Type::JSON_BOOL:
+            _value = std::get<bool>(other._value);
             break;
+        case Type::JSON_INT:
+            _value = std::get<int>(other._value);
+            break;
+        case Type::JSON_DOUBLE:
+            _value = std::get<double>(other._value);
+            break;
+        default:
+            _value = nullptr;
     }
     _type = other._type;
 }
 
 void Json::clear() {
-    this->~Json();
     _value = nullptr;
     _type = Type::JSON_NULL;
 }
@@ -131,44 +142,52 @@ void Json::swap(Json &other) {
     std::swap(other._type, _type);
 }
 
-void Json::operator=(std::nullptr_t value) {
+Json &Json::operator=(std::nullptr_t value) {
     clear();
     copy(Json{value});
+    return *this;
 }
 
-void Json::operator=(const bool value) {
+Json &Json::operator=(const bool value) {
     clear();
     copy(Json{value});
+    return *this;
 }
 
-void Json::operator=(const int value) {
+Json &Json::operator=(const int value) {
     clear();
     copy(Json{value});
+    return *this;
 }
 
-void Json::operator=(const double value) {
+Json &Json::operator=(const double value) {
     clear();
     copy(Json{value});
+    return *this;
 }
 
-void Json::operator=(const char *value) {
+Json &Json::operator=(const char *value) {
     clear();
     copy(Json{value});
+    return *this;
 }
 
-void Json::operator=(const string &value) {
+Json &Json::operator=(const string &value) {
     clear();
     copy(Json{value});
+    return *this;
 }
 
-void Json::operator=(const array &value) {
+Json &Json::operator=(const array &value) {
     clear();
     copy(Json{value});
+    return *this;
 }
 
-void Json::operator=(const object &value) {
+Json &Json::operator=(const object &value) {
     clear();
     copy(Json{value});
+    return *this;
 }
 
 bool Json::equal(const Json &other) const {
@@ -291,7 +310,7 @@ Json &Json::operator[](const char *key) const {
 
 Json &Json::operator[](const std::string &key) const {
     if (_type == Type::JSON_OBJECT) {
-        return std::get<obj_ptr>(_value)->at(key);
+        return (*std::get<obj_ptr>(_value))[key];
     }
     throw std::logic_error("operator[](const std::stirng& key) => error");
 }
@@ -411,7 +430,8 @@ std::string Json::pstringify(std::size_t spaceNum, bool isFmt) const {
             break;
         }
         case Type::JSON_OBJECT: {
-            if (isFmt) { ret += "{\n"; }
+            ret += "{";
+            if (isFmt) { ret += "\n"; }
             size_t i = 0;
             for (const auto [k, v] : *std::get<obj_ptr>(_value)) {
                 if (i != 0) {
@@ -421,7 +441,10 @@ std::string Json::pstringify(std::size_t spaceNum, bool isFmt) const {
                 if (isFmt) { ret += std::string(spaceNum + 2, ' '); }
                 ret += "\"";
                 ret += k;
-                ret += "\" : ";
+                ret += "\"";
+                if (isFmt) { ret += " "; }
+                ret += ":";
+                if (isFmt) { ret += " "; }
                 ret += v.pstringify(spaceNum + 7 + k.size(), isFmt);
                 i++;
             }

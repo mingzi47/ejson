@@ -58,14 +58,14 @@ class Json {
     void swap(Json &other);
     void clear();
 
-    void operator=(std::nullptr_t value);
-    void operator=(const bool value);
-    void operator=(const int value);
-    void operator=(const double value);
-    void operator=(const char *value);
-    void operator=(const std::string &value);
-    void operator=(const std::vector<Json> &value);
-    void operator=(const std::map<std::string, Json> &value);
+    Json &operator=(std::nullptr_t value);
+    Json &operator=(const bool value);
+    Json &operator=(const int value);
+    Json &operator=(const double value);
+    Json &operator=(const char *value);
+    Json &operator=(const std::string &value);
+    Json &operator=(const std::vector<Json> &value);
+    Json &operator=(const std::map<std::string, Json> &value);
 
     bool equal(const Json &other) const;
     bool operator==(const Json &other) const;
