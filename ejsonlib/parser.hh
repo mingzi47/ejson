@@ -7,7 +7,7 @@ namespace eee {
 
 class Parser {
   private:
-    std::string _tokens; 
+    std::string _tokens;
     Json _data;
     std::size_t _pos;
 
@@ -19,6 +19,7 @@ class Parser {
     Json parse_string();
     Json parse_array();
     Json parse_object();
+
   public:
     Parser();
     Parser(const std::string &data);

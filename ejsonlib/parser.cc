@@ -26,8 +26,8 @@ void Parser::clear() {
 
 void Parser::parse_whitespace() {
     while ((_pos < _tokens.size())
-           && (_tokens[_pos] == '\t' || _tokens[_pos] == '\n' || _tokens[_pos] == '\r'
-               || _tokens[_pos] == ' ')) {
+           && (_tokens[_pos] == '\t' || _tokens[_pos] == '\n'
+               || _tokens[_pos] == '\r' || _tokens[_pos] == ' ')) {
         this->_pos++;
     }
 }

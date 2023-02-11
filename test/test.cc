@@ -38,8 +38,8 @@ void test_c() {
     EQUAL(false, j1.size().has_value());
     EQUAL(false, j1.length().has_value());
     // {
-        Json j3{11222.111};
-        Json j7{j3};
+    Json j3{11222.111};
+    Json j7{j3};
     //     // std::cout << (j7.type == Type::JSON_DOUBLE) << "\n";
     //     // std::cout << std::get<double>(j7.value) << "\n";
     // }
@@ -100,7 +100,8 @@ void test_c() {
         // "\n"; std::cout << " { m2 = " <<
         // (*std::get<object*>(m2.value)).size()<< "\n";
     }
-    // // std::cout << " } m1 = " <<  (*std::get<object*>(m1.value)).size()<< "\n";
+    // // std::cout << " } m1 = " <<  (*std::get<object*>(m1.value)).size()<<
+    // "\n";
 
     // // test std::move
     Json mv1 = m1;
@@ -211,7 +212,9 @@ void test_parser() {
     x.insert({"222", Json{nullptr}});
     x.insert({"333", Json{std::vector<Json>{Json{false}, Json{true}}}});
     x.insert({"444", Json{1e-5}});
-    Json b = Json{std::vector<Json>{Json{x}, Json{false}, Json{std::vector<Json>{Json{true}, Json{false}}}}};
+    Json b = Json{std::vector<Json>{
+        Json{x}, Json{false},
+        Json{std::vector<Json>{Json{true}, Json{false}}}}};
 
     if (pr.getValue() == b) {
         acc_test++;
