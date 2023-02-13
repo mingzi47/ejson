@@ -13,12 +13,13 @@ class Parser {
     std::string _tokens;
     //! \brief Parsed JSON data
     Json _data;
-    //! \brief A _tokens that indicates which subscript of the tokens is resolved
+    //! \brief A _tokens that indicates which subscript of the tokens is
+    //! resolved
     std::size_t _pos;
 
     //! \brief Parse white space
     void parse_whitespace();
-    //! \brief Parse the function that startsResolve 
+    //! \brief Parse the function that startsResolve
     Json parse_value();
     //! \brief Parse null
     Json parse_null();

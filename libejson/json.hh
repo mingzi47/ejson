@@ -37,8 +37,9 @@ class Json {
     //! Type of JSON.
     Type _type;
 
-    //! \brief Convert JSON data structures to strings. This function will be called by stringify() and fmtStringify().
-    //! \param isFmt 'true' if formatting is required.
+    //! \brief Convert JSON data structures to strings. This function will be
+    //! called by stringify() and fmtStringify(). \param isFmt 'true' if
+    //! formatting is required.
     std::string pstringify(std::size_t spaceNum = 0, bool isFmt = false) const;
 
     //! \brief Deep copy a Json
@@ -65,10 +66,10 @@ class Json {
     //! \brief Construct a Json from object.
     explicit Json(const std::map<std::string, Json> &value);
 
-    Json(const Json &other);                
-    Json(Json &&other) noexcept;            
-    Json &operator=(const Json &other);     
-    Json &operator=(Json &&other) noexcept; 
+    Json(const Json &other);
+    Json(Json &&other) noexcept;
+    Json &operator=(const Json &other);
+    Json &operator=(Json &&other) noexcept;
     ~Json();
 
     void swap(Json &other);
@@ -137,33 +138,34 @@ class Json {
     //! \return 'nullopt' if the type of Json is not Type::JSON_OBJECT
     std::optional<std::map<std::string, Json>> valueObject() const;
 
-    //! \brief Get length of String  
+    //! \brief Get length of String
     //! \return 'nullopt' if the type of Json is not Type::JSON_STRING
-    std::optional<std::size_t> length() const; 
+    std::optional<std::size_t> length() const;
     //! \brief Get size of Array or Object
-    //! \return 'nullopt' if the type of Json is not Type::JSON_ARRAY or Type::JSON_OBJECT
-    std::optional<std::size_t> size() const;   
+    //! \return 'nullopt' if the type of Json is not Type::JSON_ARRAY or
+    //! Type::JSON_OBJECT
+    std::optional<std::size_t> size() const;
 
     //! \brief Consistent with vector's [].
-    Json &operator[](const std::size_t index) const; 
+    Json &operator[](const std::size_t index) const;
     //! \brief Consistent with map's [].
-    Json &operator[](const char *key) const;       
+    Json &operator[](const char *key) const;
     //! \brief Consistent with map's [].
     Json &operator[](const std::string &key) const;
 
     //! \brief Consistent with vector's push_back().
-    void push_back(const Json &other);                     
+    void push_back(const Json &other);
     //! \brief Consistent with map's insert.
-    void insert(std::pair<const char *, Json> k_v);        
+    void insert(std::pair<const char *, Json> k_v);
     //! \brief Consistent with map's insert.
-    void insert(std::pair<const std::string &, Json> k_v); 
+    void insert(std::pair<const std::string &, Json> k_v);
 
     //! \brief Consistent with vector's erase.
-    void erase(const std::size_t index); 
+    void erase(const std::size_t index);
     //! \brief Consistent with map's erase.
-    void erase(const char *key);         
+    void erase(const char *key);
     //! \brief Consistent with map's erase.
-    void erase(const std::string &key);  
+    void erase(const std::string &key);
 
     //! \brief Consistent with empty of vector or map.
     bool empty() const;

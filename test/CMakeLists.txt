@@ -8,5 +8,5 @@ foreach(v ${all_tests})
 
     add_executable(${target_name} ${v})
     target_link_libraries(${target_name} PUBLIC ejson)
-    target_link_directories(${target_name} PUBLIC ${PROJECT_SOURCE_DIR}/ejsonlib)
+    target_link_directories(${target_name} PUBLIC ${PROJECT_SOURCE_DIR}/libejson)
 endforeach()

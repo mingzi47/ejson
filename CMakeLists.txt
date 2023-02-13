@@ -7,9 +7,9 @@ project(json_test VERSION 0.0.1 LANGUAGES CXX)
 
 include(docs/doxygen.cmake)
 
-include_directories(${PROJECT_SOURCE_DIR}/ejsonlib)
+include_directories(${PROJECT_SOURCE_DIR}/libejson)
 
-add_subdirectory(./ejsonlib)
+add_subdirectory(./libejson)
 
 add_subdirectory(./test)
 
