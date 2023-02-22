@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <variant>
 
 #include "json.hh"
@@ -298,10 +299,7 @@ std::optional<std::size_t> Json::size() const {
 }
 
 Json &Json::operator[](const std::size_t index) const {
-    if (_type == Type::JSON_ARRAY) {
-        return std::get<arr_ptr>(_value)->at(index);
-    }
-    throw std::logic_error("operator[](size_t index) => error");
+    return std::get<arr_ptr>(_value)->at(index);
 }
 
 Json &Json::operator[](const char *key) const {
@@ -309,43 +307,23 @@ Json &Json::operator[](const char *key) const {
 }
 
 Json &Json::operator[](const std::string &key) const {
-    if (_type == Type::JSON_OBJECT) {
-        return (*std::get<obj_ptr>(_value))[key];
-    }
-    throw std::logic_error("operator[](const std::stirng& key) => error");
+    return (*std::get<obj_ptr>(_value))[key];
 }
 
 void Json::push_back(const Json &other) {
-    if (_type != Type::JSON_ARRAY) {
-        throw std::logic_error("push_back(const Json& otehr) => type error");
-    }
     std::get<arr_ptr>(_value)->push_back(other);
 }
 
 void Json::insert(std::pair<const char *, Json> k_v) {
-    if (_type != Type::JSON_STRING) {
-        throw std::logic_error(
-            "insert(std::pair<const char*, Json> k_v) => type error");
-    }
     std::get<obj_ptr>(_value)->insert({std::string(k_v.first), k_v.second});
 }
 
 void Json::insert(std::pair<const std::string &, Json> k_v) {
-    if (_type != Type::JSON_OBJECT) {
-        throw std::logic_error(
-            "insert(std::pair<const char*, Json> k_v) => type error");
-    }
     std::get<obj_ptr>(_value)->insert(k_v);
 }
 
 void Json::erase(const std::size_t index) {
-    if (_type != Type::JSON_ARRAY) {
-        throw std::logic_error("erase(const std::size_t index) => type error");
-    }
     auto sz = std::get<arr_ptr>(_value)->size();
-    if (sz <= index) {
-        throw std::logic_error("erase(std::size_t index) => index error");
-    }
     std::get<arr_ptr>(_value)->erase(
         std::get<arr_ptr>(_value)->begin() + index);
 }
@@ -355,9 +333,6 @@ void Json::erase(const char *key) {
 }
 
 void Json::erase(const std::string &key) {
-    if (_type != Type::JSON_OBJECT) {
-        throw std::logic_error("erase(const std::string key) => type error");
-    }
     std::get<obj_ptr>(_value)->erase(key);
 }
 
@@ -367,8 +342,6 @@ bool Json::empty() const {
             return std::get<arr_ptr>(_value)->empty();
         case Type::JSON_OBJECT:
             return std::get<obj_ptr>(_value)->empty();
-        default:
-            throw std::logic_error("type is not array, object!");
     }
 }
 
@@ -377,9 +350,6 @@ std::map<std::string, Json>::iterator Json::find(const char *key) const {
 }
 
 std::map<std::string, Json>::iterator Json::find(const std::string &key) const {
-    if (_type == Type::JSON_OBJECT) {
-        throw std::logic_error("type is not array, object!");
-    }
     return std::get<obj_ptr>(_value)->find(key);
 }
 

@@ -7,6 +7,7 @@
 #include <variant>
 #include <optional>
 #include <memory>
+#include <any>
 
 namespace eee {
 
@@ -52,11 +53,11 @@ class Json {
     //! \brief Construct a Json from nullptr_t.
     explicit Json(std::nullptr_t value);
     //! \brief Construct a Json from bool.
-    explicit Json(const bool value);
+    explicit Json(bool value);
     //! \brief Construct a Json from int.
-    explicit Json(const int value);
+    explicit Json(int value);
     //! \brief Construct a Json from double.
-    explicit Json(const double value);
+    explicit Json(double value);
     //! \brief Construct a Json from const char*.
     explicit Json(const char *value);
     //! \brief Construct a Json from string.
@@ -76,9 +77,9 @@ class Json {
     void clear();
 
     Json &operator=(std::nullptr_t value);
-    Json &operator=(const bool value);
-    Json &operator=(const int value);
-    Json &operator=(const double value);
+    Json &operator=(bool value);
+    Json &operator=(int value);
+    Json &operator=(double value);
     Json &operator=(const char *value);
     Json &operator=(const std::string &value);
     Json &operator=(const std::vector<Json> &value);
@@ -147,7 +148,7 @@ class Json {
     std::optional<std::size_t> size() const;
 
     //! \brief Consistent with vector's [].
-    Json &operator[](const std::size_t index) const;
+    Json &operator[](std::size_t index) const;
     //! \brief Consistent with map's [].
     Json &operator[](const char *key) const;
     //! \brief Consistent with map's [].
@@ -161,7 +162,7 @@ class Json {
     void insert(std::pair<const std::string &, Json> k_v);
 
     //! \brief Consistent with vector's erase.
-    void erase(const std::size_t index);
+    void erase(std::size_t index);
     //! \brief Consistent with map's erase.
     void erase(const char *key);
     //! \brief Consistent with map's erase.
